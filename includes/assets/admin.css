@@ -1,0 +1,78 @@
+/* ==========
+Advanced Custom Fields
+========== */
+
+/* Photoshop-like transparency grid background for image uploads */
+.acf-image-uploader img {
+	min-width: 0;
+	min-height: 0;
+	background-size: 16px 16px;
+	background-color: #FEFEFE;
+	background-image: linear-gradient(45deg, #D5D5D5 25%, transparent 25%, transparent 75%, #D5D5D5 75%, #D5D5D5),
+	linear-gradient(45deg, #D5D5D5 25%, transparent 25%, transparent 75%, #D5D5D5 75%, #D5D5D5);
+	background-position: 4px 4px, 12px 12px;
+}
+
+/* Fix layout issue of message descriptions when using left-aligned labels */
+.acf-field-message td.acf-input > :first-child {
+	margin-top: 0;
+}
+
+.acf-field-message td.acf-input > :last-child {
+	margin-bottom: 0;
+}
+
+/* ACF Label font sizes to match  WordPress settings pages */
+.acf-field .acf-label label {
+	font-weight: 600;
+	font-size: 14px;
+}
+
+#acf-group_5901afac45d78 .acf-field-message .acf-label label {
+	font-size: 17px;
+	line-height: 17px;
+	margin: 15px 0 0;
+	font-weight: 600;
+}
+
+/* ==========
+General WordPress
+========== */
+
+/* Fix the admin dashboard displaying oddly in Chrome 45 */
+#adminmenu {
+	transform: translateZ(0);
+}
+
+/* Allow checkbox lists to be resized vertically. Great for viewing many categories when editing a page, or editing menus within appearance > menus */
+.categorydiv div.tabs-panel,
+.customlinkdiv div.tabs-panel,
+.posttypediv div.tabs-panel,
+.taxonomydiv div.tabs-panel,
+.wp-tab-panel {
+	max-height: none;
+	resize: vertical;
+	height: 200px;
+}
+
+
+/* prettify the Media Settings page */
+.options-media-php #thumbnail_crop, label[for="thumbnail_crop"] {
+	display: none;
+}
+
+.options-media-php h1::after {
+	content: " (Developer Use Only)";
+}
+
+.options-media-php input[name='crop_thumb_w'],
+.options-media-php input[name='crop_thumb_h'],
+.options-media-php input[name='rssfeed_w'],
+.options-media-php input[name='rssfeed_h'] {
+	margin-left: 2.2em;
+}
+
+.options-media-php table:first-of-type input:first-of-type {
+	margin-right: 2em;
+}
+

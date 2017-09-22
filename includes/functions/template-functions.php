@@ -52,6 +52,12 @@ function theme_vod_grid_item( $post_id ) {
 	}
 	
 	$excerpt = wp_trim_words( $excerpt, 20 );
+	
+	$free = get_field('free_or_paid', $post_id) == 'Free';
+	$freepaid_text = 'Rent';
+	if ( $free ) $freepaid_text = 'Free';
+	else if ( get_field( 'trailer_embed_code', $post_id ) ) $freepaid_text = 'Rent + Trailer';
+	
 	?>
 	<div <?php post_class( array('cell vod-item') ); ?>>
 		<div class="cell-inner">
@@ -59,6 +65,8 @@ function theme_vod_grid_item( $post_id ) {
 			<?php echo theme_get_vod_thumbnail( $post_id ); ?>
 			
 			<div class="vod-title"><?php
+			echo '<span class="freepaid-text ', ($free ? 'free' : 'paid'), '">', $freepaid_text, '</span>';
+			
 			if ( $is_episode ) {
 				$series = get_field( 'series', $post_id );
 				$episode = get_field( 'episode_name', $post_id );

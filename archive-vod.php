@@ -24,6 +24,8 @@ get_header();
 					?>
 				</div>
 				
+				<?php get_template_part( 'templates/parts/pagination-archive', get_post_type() ); ?>
+				
 			</main>
 	
 		</div>

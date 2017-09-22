@@ -89,3 +89,106 @@ function rs_more_body_classes( $classes ) {
 	return $classes;
 }
 add_filter( 'body_class', 'rs_more_body_classes' );
+
+
+
+/**
+ * Upload an image from the internet to the media section. Optionally assigns as featured image to a post.
+ * Based on example from: https://codex.wordpress.org/Function_Reference/wp_handle_sideload
+ *
+ * @param $image_url
+ * @param integer $post_id
+ * @param null $custom_filename
+ *
+ * @return bool
+ */
+function rs_upload_image_url_to_media( $image_url, $post_id = 0, $custom_filename = null ) {
+	// Gives us access to the download_url() and wp_handle_sideload() functions
+	require_once( ABSPATH . 'wp-admin/includes/file.php' );
+	
+	$timeout_seconds = 5;
+	
+	// Download file to temp dir
+	$temp_file = download_url( $image_url, $timeout_seconds );
+	
+	if ( !is_wp_error( $temp_file ) ) {
+		
+		$extension = pathinfo( $image_url, PATHINFO_EXTENSION );
+		if ( !$extension ) $extension = 'jpg';
+		
+		// Array based on $_FILE as seen in PHP file uploads
+		$file = array(
+			'name'     => basename($image_url), // ex: wp-header-logo.png
+			'type'     => 'image/' . strtolower($extension),
+			'tmp_name' => $temp_file,
+			'error'    => 0,
+			'size'     => filesize($temp_file),
+		);
+		
+		if ( $custom_filename !== null ) {
+			$file['name'] = sanitize_title_with_dashes( $custom_filename ) . '.' . $extension;
+		}
+		
+		$overrides = array(
+			// Tells WordPress to not look for the POST form
+			// fields that would normally be present as
+			// we downloaded the file from a remote server, so there
+			// will be no form fields
+			// Default is true
+			'test_form' => false,
+			
+			// Setting this to false lets WordPress allow empty files, not recommended
+			// Default is true
+			'test_size' => true,
+		);
+		
+		// Move the temporary file into the uploads directory
+		$results = wp_handle_sideload( $file, $overrides );
+		
+		if ( !empty( $results['error'] ) ) {
+			// Insert any error handling here
+			ob_start();
+			var_dump($results['error']);
+			$err = ob_get_clean();
+			wp_die('<h2>Error uploading remote file:</h2><pre>' . esc_html($err) . '</pre>');
+			exit;
+		} else {
+			// Upload success, attach to media library
+			
+			// Full path to file
+			$filename = $results['file'];
+			
+			// Check the type of file. We'll use this as the 'post_mime_type'.
+			$filetype = wp_check_filetype( basename( $filename ), null );
+			
+			// Get the path to the upload directory.
+			$wp_upload_dir = wp_upload_dir();
+			
+			// Prepare an array of post data for the attachment.
+			$attachment = array(
+				'guid'           => $wp_upload_dir['url'] . '/' . basename( $filename ),
+				'post_mime_type' => $filetype['type'],
+				'post_title'     => preg_replace( '/\.[^.]+$/', '', basename( $filename ) ),
+				'post_content'   => '',
+				'post_status'    => 'inherit'
+			);
+			
+			// Insert the attachment.
+			$attachment_id = wp_insert_attachment( $attachment, $filename, $post_id );
+			
+			// Generate the metadata for the attachment, and update the database record.
+			require_once( ABSPATH . 'wp-admin/includes/image.php' );
+			$attach_data = wp_generate_attachment_metadata( $attachment_id, $filename );
+			wp_update_attachment_metadata( $attachment_id, $attach_data );
+			
+			// Set the featured image for the post, if set
+			if ( $post_id ) set_post_thumbnail( $post_id, $attachment_id );
+			
+			return $attachment_id;
+		}
+		
+	}
+	
+	return false;
+	
+}

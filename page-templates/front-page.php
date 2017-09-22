@@ -68,16 +68,32 @@ get_header();
 	</div>
 </section>
 
+<?php if ( shortcode_exists('custom-twitter-feeds') ) { ?>
+<section class="fp-twitter bloodsplat-top-right">
+	<div class="inside">
+		<h2 class="section-title">Latest Tweets from Hart D. Fisher</h2>
+		
+		<div class="twitter-feed-shortcode">
+			<?php echo do_shortcode('[custom-twitter-feeds]'); ?>
+		</div>
+	</div>
+</section>
+<?php } ?>
+
 <?php
 $args = array(
 	'post_type' => 'post',
-	'posts_per_page' => 3,
+	'posts_per_page' => 6,
 );
+
+$news_ad = get_field( 'ads_front_page_news_ad', 'options' );
+if ( $news_ad && $news_ad[0]['enable'] ) {
+	$args['posts_per_page'] = 5;
+}
 
 $news_posts = new WP_Query($args);
 
 if ( $news_posts->have_posts() ) {
-	
 	?>
 	<section class="fp-news">
 		<div class="inside">
@@ -105,6 +121,11 @@ if ( $news_posts->have_posts() ) {
 					?>
 					<div <?php post_class( array('cell') ); ?>>
 						<div class="cell-inner">
+							
+							<div class="post-image">
+								<a href="<?php the_permalink(); ?>"></a>
+								<img src="<?php echo esc_attr($image[0]); ?>" alt="<?php echo esc_attr($alt); ?>" width="<?php echo esc_attr($image[1]); ?>" height="<?php echo esc_attr($image[2]); ?>">
+							</div>
 						
 							<h2 class="post-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
 							
@@ -117,16 +138,38 @@ if ( $news_posts->have_posts() ) {
 									<div class="year"><?php echo $year; ?></div>
 								<?php } ?>
 							</div>
-							
-							<div class="post-image">
-								<img src="<?php echo esc_attr($image[0]); ?>" alt="<?php echo esc_attr($alt); ?>" width="<?php echo esc_attr($image[1]); ?>" height="<?php echo esc_attr($image[2]); ?>">
-							</div>
 						
 						</div>
 					</div>
 					<?php
 				
 				endwhile;
+				
+				// Display advertisement if enabled
+				if ( $news_ad && $news_ad[0]['enable'] ) {
+					$ad = array(
+						'title' => $news_ad[0]['title'],
+						'background' => $news_ad[0]['background'],
+						'url' => $news_ad[0]['url'],
+					);
+					
+					if ( !$ad['background'] ) $ad['background'] = get_template_directory_uri() . '/includes/images/default-cropped.jpg';
+					
+					?>
+					<div class="cell post">
+						<div class="cell-inner">
+							
+							<div class="post-image">
+								<a href="<?php echo esc_attr($ad['url']); ?>"></a>
+								<img src="<?php echo esc_attr($ad['background']); ?>" alt="<?php echo esc_attr($ad['title']); ?>">
+							</div>
+							
+							<h2 class="post-title"><a href="<?php echo esc_attr($ad['url']); ?>"><?php echo esc_html($ad['title']); ?></a></h2>
+						
+						</div>
+					</div>
+					<?php
+				}
 				?>
 			</div>
 			
@@ -143,7 +186,8 @@ if ( $news_posts->have_posts() ) {
 <?php
 $args = array(
 	'post_type' => 'vod',
-	'posts_per_page' => 12,
+	'posts_per_page' => 6,
+    'orderby' => 'rand',
 );
 
 $vod_posts = new WP_Query($args);

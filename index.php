@@ -24,7 +24,6 @@ get_header();
 					get_template_part( 'templates/parts/header-archive', get_post_type() );
 					get_template_part( 'templates/parts/empty-archive', get_post_type() );
 				endif;
-	
 				?>
 			</main>
 	

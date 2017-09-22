@@ -15,7 +15,7 @@ the_post();
 		</div>
 	</div>
 	
-	<div class="site-content <?php echo apply_filters( "sidebar_enabled", true ) ? 'with-sidebar' : 'no-sidebar'; ?>">
+	<div class="site-content bloodsplat-top-right <?php echo apply_filters( "sidebar_enabled", true ) ? 'with-sidebar' : 'no-sidebar'; ?>">
 		<div class="inside">
 			
 			<main class="main-content">

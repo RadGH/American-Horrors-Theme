@@ -11,7 +11,9 @@ include_once 'includes/functions/plugin-acf.php'; // ACF extensions
 include_once 'includes/functions/plugin-yoast.php'; // Yoast extensions
 include_once 'includes/functions/plugin-woocommerce.php'; // WooCommerce extensions
 
-include_once 'includes/functions/vod.php'; // Video On Demand post type
+include_once 'includes/functions/advertisements.php'; // Ads
+include_once 'includes/functions/paid-video.php'; // Wowza Video On Demand post type
+include_once 'includes/functions/vod.php'; // Free YouTube video post type
 include_once 'includes/widgets/recent-vods.php'; // Recent VODs Widget
 
 // Disable sidebar

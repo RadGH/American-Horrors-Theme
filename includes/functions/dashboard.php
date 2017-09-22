@@ -3,6 +3,7 @@
 // ADMIN: custom css
 function theme_enqueue_admin_scripts() {
 	wp_enqueue_style( 'theme-admin', get_template_directory_uri() . '/includes/assets/admin.css', array(), false );
+	wp_enqueue_script( 'theme-admin', get_template_directory_uri() . '/includes/assets/admin.js', array('jquery'), false );
 }
 
 add_action( 'admin_enqueue_scripts', 'theme_enqueue_admin_scripts', 30 );

@@ -89,5 +89,84 @@ function register_vod_post_type() {
 		'show_tagcloud'              => true,
 	);
 	register_taxonomy( 'vod_series', array( 'vod' ), $args );
+	
+	acf_add_options_sub_page(array(
+		'page_title' 	=> 'Add from Youtube',
+		'menu_title' 	=> 'Add from Youtube',
+		'parent_slug' 	=> 'edit.php?post_type=vod',
+	));
 }
 add_action( 'init', 'register_vod_post_type', 8 );
+
+function ah_quick_add_youtube_video($post_id) {
+	if ( $post_id != 'options' ) return;
+	
+	$title = get_field( 'vod_quick_add_title', 'options' );
+	if ( !$title ) return;
+	
+	$description = get_field( 'vod_quick_add_description', 'options' );
+	$image_url = get_field( 'vod_quick_add_image_url', 'options' );
+	$embed_code = get_field( 'vod_quick_add_embed_code', 'options' );
+	
+	$free_video_term_id = 37;
+	
+	$args = array(
+		'post_title' => $title,
+	    'post_content' => $description,
+	    'post_status' => 'publish',
+	    'post_type' => 'vod',
+	);
+	
+	$post_id = wp_insert_post( $args );
+	
+	// Remove everything that was saved so this can run again in the future.
+	delete_field( 'vod_quick_add_video_url', 'options' );
+	delete_field( 'vod_quick_add_title', 'options' );
+	delete_field( 'vod_quick_add_description', 'options' );
+	delete_field( 'vod_quick_add_image_url', 'options' );
+	delete_field( 'vod_quick_add_embed_code', 'options' );
+	
+	if ( $post_id && !is_wp_error($post_id) ) {
+		// success
+		
+		// custom fields
+		update_field( 'free_or_paid', 'Free', $post_id );
+		update_field( 'trailer_embed_code', '', $post_id );
+		update_field( 'embed_code', $embed_code, $post_id );
+		
+		// add the "Free Videos" term
+		wp_set_object_terms( $post_id, $free_video_term_id, 'vod_series' );
+		
+		// add the image
+		if ( $image_url ) {
+			rs_upload_image_url_to_media( $image_url, $post_id, $title );
+		}
+		
+		wp_redirect( admin_url('edit.php?post_type=vod&page=acf-options-add-from-youtube&added_from_youtube=' . $post_id) );
+		exit;
+	}else{
+		if ( is_wp_error($post_id) ) {
+			wp_die( $post_id );
+			exit;
+		}else{
+			wp_die( 'Failed to insert new post' );
+			exit;
+		}
+	}
+}
+add_action( 'acf/save_post', 'ah_quick_add_youtube_video', 20 );
+
+
+function ah_notify_quick_added_video() {
+	$video_id = isset($_GET['added_from_youtube']) ? (int) $_GET['added_from_youtube'] : false;
+	if ( !$video_id ) return;
+	if ( !get_post($video_id) ) return;
+	
+	?>
+	<div class="notice notice-success">
+		<p><strong>Video added successfully</strong></p>
+		<p>The video &ldquo;<?php echo esc_html( get_the_title( $video_id) ); ?>&rdquo; has been added. <a href="<?php echo esc_attr( get_edit_post_link($video_id) ); ?>" target="_blank">Go to video</a></p>
+	</div>
+	<?php
+}
+add_action( 'admin_notices', 'ah_notify_quick_added_video' );

@@ -71,7 +71,7 @@ get_header();
 <?php if ( shortcode_exists('custom-twitter-feeds') ) { ?>
 <section class="fp-twitter bloodsplat-top-right">
 	<div class="inside">
-		<h2 class="section-title">Latest Tweets from Hart D. Fisher</h2>
+		<h2 class="section-title">American Horrors on Twitter <em>@AmericanHorrorsU</em></h2>
 		
 		<div class="twitter-feed-shortcode">
 			<?php echo do_shortcode('[custom-twitter-feeds]'); ?>

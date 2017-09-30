@@ -1151,10 +1151,11 @@ article.loop-archive .loop-thumbnail {
 	color: #e32a0c;
 }
 
-.fp-twitter .section-title em {
+.fp-twitter .section-title a {
 	color: #111013;
 	font-size: 24px;
 	margin-left: 10px;
+	text-decoration: none;
 }
 
 a#ctf-more {
